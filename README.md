@@ -23,14 +23,16 @@ npm run preview   # serves the build
 npm run check     # Astro and TypeScript checks
 ```
 
-## Publishing (not done yet)
+## Publishing
 
-`.github/workflows/deploy.yml` builds and deploys to GitHub Pages, but **only
-when run by hand**. Pushing does not deploy. To publish:
+Live at <https://matthewstapley.github.io/stapled-scaffolding-demo/> from
+[MatthewStapley/stapled-scaffolding-demo](https://github.com/MatthewStapley/stapled-scaffolding-demo)
+(public, GitHub Pages with GitHub Actions as the source).
 
-1. Create a GitHub repository (suggested name `stapled-scaffolding-demo`) and push `main`.
-2. In the repository, open **Settings → Pages**, and under **Source** choose **GitHub Actions**.
-3. Open **Actions → Deploy to GitHub Pages → Run workflow**.
+`.github/workflows/deploy.yml` builds and deploys, but **only when run by
+hand**. Pushing does not deploy. To publish changes, push `main`, then open
+**Actions → Deploy to GitHub Pages → Run workflow** (or run
+`gh workflow run deploy.yml`).
 
 The workflow builds with `SITE_BASE=/<repo-name>`. Internal links and public
 files go through `asset()` in `src/data/site.ts`, so they follow the base. To
