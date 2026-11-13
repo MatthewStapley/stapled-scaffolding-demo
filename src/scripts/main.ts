@@ -204,6 +204,18 @@ function initServices() {
     if (readout) readout.textContent = `${String(i + 1).padStart(2, "0")} / ${String(rows.length).padStart(2, "0")}`;
   };
   rows[0].classList.add("is-active");
+  // The preview images sit clipped until hovered, so lazy loading never
+  // fetches them. Load them as the section approaches (desktop only: the
+  // preview is hidden on phones).
+  const preview = $("[data-svc-preview]");
+  if (preview && getComputedStyle(preview).display !== "none") {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      imgs.forEach((im) => (im.loading = "eager"));
+      io.disconnect();
+    }, { rootMargin: "800px 0px" });
+    io.observe(preview);
+  }
   rows.forEach((r) => {
     const sum = $("summary", r)!;
     sum.addEventListener("pointerenter", () => show(r.dataset.svc));
