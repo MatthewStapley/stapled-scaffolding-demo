@@ -1,0 +1,208 @@
+---
+import { asset, brand } from "../data/site";
+import Icon from "./Icon.astro";
+
+// Height gauge down the right edge: one tick per metre, labelled every 2 m (one lift).
+const metres = Array.from({ length: 13 }, (_, i) => 12 - i);
+const disciplines = ["Houses & extensions", "Commercial & new build", "Heritage & stone", "Temporary roofs"];
+---
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero__media" aria-hidden="true">
+    <picture>
+      <source media="(max-aspect-ratio: 4/5)" srcset={asset("/video/facade-tall.webp")} />
+      <img src={asset("/video/facade-wide.webp")} alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+    </picture>
+    <video
+      muted
+      playsinline
+      loop
+      preload="none"
+      disablepictureinpicture
+      data-hero-video
+      data-wide={asset("/video/facade-wide.mp4")}
+      data-tall={asset("/video/facade-tall.mp4")}
+    ></video>
+  </div>
+  <div class="hero__shade" aria-hidden="true"></div>
+
+  <div class="hero__gauge" aria-hidden="true">
+    {metres.map((m) => (
+      <span class:list={["hero__tick", { "is-lift": m % 2 === 0 }]}>{m % 2 === 0 ? `${m}.0` : ""}</span>
+    ))}
+  </div>
+
+  <div class="hero__body wrap">
+    <p class="hero__eyebrow label" data-hero-in>
+      <span class="tick">●</span> Scaffolding contractors · {brand.area}
+    </p>
+    <h1 class="hero__title display" id="hero-title">
+      <span class="line"><span data-hero-line>First on site.</span></span>
+      <span class="line"><span data-hero-line>Last to leave<b>.</b></span></span>
+    </h1>
+    <div class="hero__foot">
+      <p class="hero__lede" data-hero-in>
+        Transom puts up scaffolding for homeowners, builders and main contractors. Chimney stacks,
+        extensions, full-height façades and temporary roofs, planned properly and inspected while it stands.
+      </p>
+      <div class="hero__cta" data-hero-in>
+        <a class="btn" href="#quote">Request a quote <Icon name="arrow" /></a>
+        <a class="link" href="#method">See how a scaffold goes up <Icon name="down" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__rail wrap" data-hero-in>
+    <span class="hero__ledger" aria-hidden="true" data-hero-ledger></span>
+    <ul>
+      {disciplines.map((d, i) => (
+        <li><span class="label">L{i + 1}</span>{d}</li>
+      ))}
+    </ul>
+  </div>
+
+  <button class="hero__pause" type="button" data-hero-pause hidden aria-pressed="false">
+    <span class="hero__pause-icon" aria-hidden="true"></span>
+    <span data-hero-pause-label>Pause background video</span>
+  </button>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: calc(100vh - var(--bar-h));
+    min-height: max(40rem, calc(100svh - var(--bar-h)));
+    display: grid;
+    grid-template-rows: 1fr auto;
+    color: var(--on-ink);
+    background: var(--ink);
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .hero__media, .hero__media picture, .hero__media img, .hero__media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__media { z-index: -2; }
+  .hero__media img { object-position: 50% 30%; }
+  .hero__media video { opacity: 0; transition: opacity 1200ms var(--ease); }
+  .hero__media video.is-playing { opacity: 1; }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, #0d0f10cc 0%, #0d0f1000 22%),
+      linear-gradient(0deg, #0d0f10 0%, #0d0f10e6 24%, #0d0f1066 55%, #0d0f1000 75%),
+      linear-gradient(90deg, #0d0f10b3 0%, #0d0f1000 60%);
+  }
+
+  .hero__body {
+    align-self: end;
+    padding-top: calc(var(--header-h) + 4rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    padding-right: calc(var(--gutter) + 3.5rem);
+  }
+  .hero__eyebrow { margin-bottom: clamp(1rem, 2vw, 1.75rem); color: var(--on-ink); }
+  .hero__eyebrow .tick { font-size: 0.6rem; vertical-align: 0.15em; margin-right: 0.35rem; }
+  .hero__title {
+    font-size: clamp(4.25rem, 1rem + 13.2vw, 15.5rem);
+    margin-left: -0.04em;
+  }
+  .hero__title .line { display: block; overflow: hidden; padding-bottom: 0.02em; margin-bottom: -0.02em; }
+  .hero__title .line > span { display: inline-block; }
+  .hero__title b { color: var(--signal); }
+  .hero__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(1.5rem, 3vw, 2.75rem);
+  }
+  .hero__lede { max-width: 40ch; font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem); line-height: 1.5; color: #dfe3e2; }
+  .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.75rem; }
+
+  .hero__rail { position: relative; padding-bottom: clamp(1rem, 2vw, 1.5rem); padding-right: calc(var(--gutter) + 3.5rem); }
+  .hero__ledger { display: block; height: 1px; background: var(--rule-ink); transform-origin: left; }
+  .hero__rail ul {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-top: 0.9rem;
+    font-size: 0.875rem;
+    color: var(--on-ink-soft);
+  }
+  .hero__rail li { display: flex; gap: 0.6rem; align-items: baseline; }
+  .hero__rail .label { color: var(--signal); font-size: 0.6875rem; }
+
+  /* Height gauge */
+  .hero__gauge {
+    position: absolute;
+    top: calc(var(--header-h) + 1.5rem);
+    bottom: clamp(1rem, 2vw, 1.5rem);
+    right: var(--gutter);
+    width: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid var(--rule-ink);
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    color: var(--on-ink-soft);
+    text-align: right;
+  }
+  .hero__tick { position: relative; height: 0; line-height: 0; padding-right: 0.9rem; }
+  .hero__tick::after {
+    content: "";
+    position: absolute;
+    right: 0; top: 0;
+    width: 0.35rem;
+    height: 1px;
+    background: var(--rule-ink);
+  }
+  .hero__tick.is-lift::after { width: 0.6rem; background: var(--on-ink-soft); }
+
+  .hero__pause {
+    position: absolute;
+    left: calc(var(--gutter) - 0.5rem);
+    top: calc(var(--header-h) + 0.75rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--on-ink-soft);
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hero__pause:hover { color: var(--on-ink); }
+  .hero__pause-icon { width: 0.7rem; height: 0.7rem; border-inline: 3px solid currentColor; }
+  .hero__pause[aria-pressed="true"] .hero__pause-icon {
+    border: 0;
+    background: currentColor;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+
+  /* Opening: lines rise out of their own line box. Never blocks reading. */
+  :global(html.js-motion) .hero [data-hero-line] { transform: translateY(105%); }
+  :global(html.js-motion) .hero [data-hero-in] { opacity: 0; }
+  :global(html.js-motion) .hero__ledger { transform: scaleX(0); }
+
+  @media (max-width: 900px) {
+    .hero__rail ul { grid-template-columns: repeat(2, 1fr); gap: 0.4rem 1rem; }
+  }
+  @media (max-width: 640px) {
+    .hero__gauge { width: 1.6rem; right: 0.6rem; font-size: 0; }
+    .hero__body, .hero__rail { padding-right: calc(var(--gutter) + 1.25rem); }
+    .hero__title { font-size: clamp(3.6rem, 17.5vw, 6rem); }
+    .hero__cta .btn { flex: 1 1 100%; }
+    .hero__pause span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  }
+</style>

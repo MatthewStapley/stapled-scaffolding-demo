@@ -1,0 +1,39 @@
+---
+import { images, src, srcset } from "../data/images";
+const i = images.nightGlow;
+---
+<section class="night" aria-labelledby="night-title">
+  <div class="night__media" aria-hidden="true">
+    <img src={src(i, 1600)} srcset={srcset(i)} sizes="100vw" alt="" loading="lazy" decoding="async" data-night-img />
+  </div>
+  <div class="night__text wrap">
+    <p class="label"><span class="tick">●</span> Town-centre work</p>
+    <h2 class="h2" id="night-title">Up before<br />the shops open.</h2>
+    <p class="lede">Where a scaffold blocks a pavement or shopfront, we can erect and strike outside trading hours, light it at night and keep a safe route for people walking past.</p>
+  </div>
+  <span class="credit-tag">Illustrative image</span>
+</section>
+
+<style>
+  .night {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+    background: #070808;
+  }
+  .night__media { position: absolute; inset: -8% 0; z-index: -1; }
+  .night__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+  .night::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(0deg, #070808 0%, #070808d9 28%, #07080833 60%, #07080866 100%);
+  }
+  .night__text { display: grid; gap: 1.25rem; padding-bottom: var(--section); padding-top: 40svh; }
+  .night__text .lede { color: #d9dcd6; }
+  .night .credit-tag { left: auto; right: var(--gutter); bottom: 1rem; }
+</style>

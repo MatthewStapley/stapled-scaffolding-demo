@@ -1,0 +1,180 @@
+---
+import { brand, nav } from "../data/site";
+import Mark from "./Mark.astro";
+import Icon from "./Icon.astro";
+---
+<header class="hdr" data-header>
+  <div class="hdr__in">
+    <a href="#top" class="hdr__home" aria-label={`${brand.fullName}, back to top`}><Mark /></a>
+
+    <nav class="hdr__nav" aria-label="Main">
+      <ul>
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="hdr__act">
+      <a class="hdr__phone" href={brand.phoneHref} data-contact="phone"><Icon name="phone" />{brand.phone}</a>
+      <a class="hdr__quote" href="#quote"><span class="hdr__long">Get a&nbsp;</span>quote</a>
+      <button class="hdr__menu" type="button" aria-label="Menu" aria-haspopup="dialog" aria-controls="menu" aria-expanded="false" data-menu-open>
+        <span>Menu</span><Icon name="menu" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog class="menu" id="menu" aria-label="Menu" data-menu>
+  <div class="menu__top">
+    <Mark />
+    <button class="menu__close" type="button" data-menu-close aria-label="Close menu"><Icon name="close" /></button>
+  </div>
+  <nav aria-label="Menu">
+    <ol class="menu__list">
+      {nav.map((n, i) => (
+        <li style={`--i:${i}`}><a href={n.href} data-menu-link><span class="label">0{i + 1}</span>{n.label}</a></li>
+      ))}
+      <li style={`--i:${nav.length}`}><a href="#quote" data-menu-link><span class="label">0{nav.length + 1}</span>Get a quote</a></li>
+    </ol>
+  </nav>
+  <div class="menu__contact">
+    <p class="label soft">Talk to the yard</p>
+    <a href={brand.phoneHref} data-contact="phone"><Icon name="phone" />{brand.phone}</a>
+    <a href={brand.whatsappHref} data-contact="whatsapp"><Icon name="chat" />WhatsApp photos of the job</a>
+    <a href={`mailto:${brand.email}`} data-contact="email"><Icon name="mail" />{brand.email}</a>
+  </div>
+</dialog>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--header-h);
+    margin-bottom: calc(var(--header-h) * -1);
+    color: var(--on-ink);
+    transition: transform 380ms var(--ease), background-color 300ms var(--ease), box-shadow 300ms var(--ease);
+  }
+  .hdr.is-solid {
+    background: color-mix(in srgb, var(--ink) 88%, transparent);
+    backdrop-filter: blur(12px) saturate(1.2);
+    box-shadow: 0 1px 0 var(--rule-ink);
+  }
+  .hdr.is-hidden { transform: translateY(-100%); }
+  .hdr:focus-within { transform: none; }
+  .hdr__in {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-inline: var(--gutter);
+  }
+  .hdr__home { text-decoration: none; display: inline-flex; min-height: 2.75rem; align-items: center; }
+  .hdr__nav { margin-left: auto; }
+  .hdr__nav ul { display: flex; gap: clamp(1.25rem, 2.2vw, 2.25rem); }
+  .hdr__nav a, .hdr__phone {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 550;
+    text-decoration: none;
+  }
+  .hdr__nav a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0.55rem;
+    height: 1px;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 280ms var(--ease);
+  }
+  .hdr__nav a:hover::after, .hdr__nav a[aria-current="true"]::after { transform: scaleX(1); transform-origin: left; }
+  .hdr__act { display: flex; align-items: center; gap: 1.25rem; }
+  .hdr__phone { gap: 0.45rem; white-space: nowrap; font-family: var(--mono); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; }
+  .hdr__phone :global(svg) { width: 1rem; height: 1rem; color: var(--signal); }
+  .hdr__quote {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px var(--signal);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 220ms var(--ease), color 220ms var(--ease);
+  }
+  .hdr__quote:hover { background: var(--signal); color: var(--ink); }
+  .hdr__menu {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.25rem 0 0.75rem;
+    border: 0;
+    background: none;
+    font-weight: 600;
+  }
+  .hdr__menu :global(svg) { width: 1.5rem; height: 1.5rem; }
+
+  @media (max-width: 1180px) { .hdr__phone { display: none; } }
+  @media (max-width: 900px) {
+    .hdr__nav { display: none; }
+    .hdr__act { margin-left: auto; gap: 0.5rem; }
+    .hdr__menu { display: inline-flex; }
+    .hdr__quote { min-height: 2.5rem; padding: 0 0.8rem; font-size: 0.875rem; }
+  }
+  .hdr__quote { white-space: nowrap; }
+  .hdr__long { text-transform: none; }
+  @media (max-width: 520px) {
+    .hdr__long { display: none; }
+    .hdr__quote { text-transform: capitalize; }
+  }
+  @media (max-width: 340px) { .hdr__menu span { display: none; } }
+
+  /* ---------- Mobile menu ---------- */
+  .menu {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0 var(--gutter) max(1.5rem, env(safe-area-inset-bottom));
+    border: 0;
+    background: var(--ink);
+    color: var(--on-ink);
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .menu[open] { display: flex; animation: menu-in 320ms var(--ease) both; }
+  .menu::backdrop { background: var(--ink); }
+  @keyframes menu-in { from { opacity: 0; } }
+  .menu__top { display: flex; justify-content: space-between; align-items: center; height: var(--header-h); flex: none; }
+  .menu__close { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; margin-right: -0.5rem; border: 0; background: none; }
+  .menu__close :global(svg) { width: 1.6rem; height: 1.6rem; }
+  .menu__list { margin-top: 1.5rem; border-top: 1px solid var(--rule-ink); }
+  .menu__list li { border-bottom: 1px solid var(--rule-ink); animation: menu-item 520ms var(--ease) both; animation-delay: calc(60ms + var(--i) * 45ms); }
+  @keyframes menu-item { from { opacity: 0; transform: translateY(14px); } }
+  .menu__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0 0.7rem;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    line-height: 0.9;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .menu__list .label { color: var(--signal); transform: translateY(-0.6em); }
+  .menu__contact { margin-top: auto; padding-top: 2rem; display: grid; gap: 0.25rem; }
+  .menu__contact a { display: flex; align-items: center; gap: 0.75rem; min-height: 3rem; text-decoration: none; font-weight: 550; }
+  .menu__contact :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--signal); }
+  @media (prefers-reduced-motion: reduce) {
+    .menu[open], .menu__list li { animation: none; }
+  }
+</style>

@@ -1,0 +1,191 @@
+---
+import { services } from "../data/content";
+import { src, srcset } from "../data/images";
+import { brand } from "../data/site";
+import Icon from "./Icon.astro";
+---
+<section class="svc section" id="services" aria-labelledby="svc-title">
+  <div class="wrap svc__head">
+    <p class="kicker label"><b>02</b> Services</p>
+    <div class="svc__intro">
+      <h2 class="h2" id="svc-title">Access for<br />every kind of job.</h2>
+      <p class="lede soft">Tube-and-fitting and system scaffolding, from a single chimney stack to a city block. Open any line for what's included.</p>
+    </div>
+  </div>
+
+  <div class="wrap svc__body">
+    <div class="svc__preview" aria-hidden="true" data-svc-preview>
+      {services.map((s, i) => (
+        <img
+          src={src(s.image, 1024)}
+          srcset={srcset(s.image)}
+          sizes="(max-width: 1000px) 0px, 40vw"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class:list={{ "is-on": i === 0 }}
+          style={s.image.pos ? `object-position:${s.image.pos}` : undefined}
+          data-svc-img={s.slug}
+        />
+      ))}
+      <span class="svc__readout label" data-svc-readout>01 / {String(services.length).padStart(2, "0")}</span>
+      <span class="credit-tag">Illustrative image</span>
+    </div>
+
+    <ol class="svc__list">
+      {services.map((s, i) => (
+        <li>
+          <details class="row" data-svc={s.slug} data-index={i}>
+            <summary>
+              <span class="row__no label">{String(i + 1).padStart(2, "0")}</span>
+              <span class="row__title">{s.title}</span>
+              <span class="row__short">{s.short}</span>
+              <span class="row__icon" aria-hidden="true"><Icon name="plus" /></span>
+            </summary>
+            <div class="row__more">
+              <figure class="row__img frame">
+                <img src={src(s.image, 1024)} srcset={srcset(s.image)} sizes="(min-width: 1001px) 0px, 92vw" alt={s.image.alt} loading="lazy" decoding="async" style={s.image.pos ? `object-position:${s.image.pos}` : undefined} />
+                <figcaption class="credit-tag">Illustrative image</figcaption>
+              </figure>
+              <p>{s.body}</p>
+              <ul class="row__inc">
+                {s.includes.map((x) => <li>{x}</li>)}
+              </ul>
+              <a class="link" href={`?service=${s.slug}#quote`} data-service-link={s.slug}>Ask about {s.title.toLowerCase()} <Icon name="arrow" /></a>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <p class="wrap svc__aside">
+    Not sure what you need? <a href={brand.whatsappHref} data-contact="whatsapp">Send a photo of the building on WhatsApp</a> and we'll tell you.
+  </p>
+</section>
+
+<style>
+  .svc { background: var(--ink); }
+  .svc__intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-bottom: clamp(3rem, 6vw, 5.5rem);
+  }
+  .svc__body {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 4vw, 5rem);
+    align-items: start;
+  }
+  .svc__preview {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    aspect-ratio: 4 / 5;
+    max-height: calc(100svh - var(--header-h) - 3rem);
+    overflow: hidden;
+    background: var(--ink-3);
+  }
+  .svc__preview img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    clip-path: inset(100% 0 0 0);
+    transform: scale(1.06);
+    transition: clip-path 700ms var(--ease-in-out), transform 1100ms var(--ease);
+  }
+  .svc__preview img.is-on { clip-path: inset(0 0 0 0); transform: scale(1); z-index: 1; }
+  .svc__preview img.was-on { clip-path: inset(0 0 0 0); z-index: 0; transition: none; }
+  .svc__readout {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    z-index: 2;
+    padding: 0.25rem 0.5rem;
+    background: var(--ink);
+    color: var(--on-ink);
+  }
+  .svc__preview .credit-tag { z-index: 2; }
+
+  .svc__list { border-top: 1px solid var(--rule-ink); }
+  .row { border-bottom: 1px solid var(--rule-ink); }
+  .row summary {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) 2.75rem;
+    grid-template-areas: "no title icon" "no short icon";
+    column-gap: 1rem;
+    row-gap: 0.35rem;
+    padding: clamp(1.15rem, 2vw, 1.6rem) 0;
+    cursor: pointer;
+    position: relative;
+  }
+  .row summary::-webkit-details-marker { display: none; }
+  .row summary::before {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -1px;
+    width: 100%;
+    height: 1px;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 500ms var(--ease);
+  }
+  .row summary:hover::before, .row[open] summary::before, .row.is-active summary::before { transform: scaleX(1); }
+  .row__no { grid-area: no; padding-top: 0.55rem; color: var(--on-ink-soft); }
+  .row.is-active .row__no, .row[open] .row__no { color: var(--signal); }
+  .row__title {
+    grid-area: title;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2rem, 1.3rem + 2.6vw, 3.75rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+    transition: transform 400ms var(--ease);
+  }
+  .row summary:hover .row__title { transform: translateX(0.35rem); }
+  .row__short { grid-area: short; color: var(--on-ink-soft); }
+  .row__icon {
+    grid-area: icon;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--rule-ink);
+    transition: transform 400ms var(--ease), background-color 300ms var(--ease);
+  }
+  .row__icon :global(svg) { width: 1.1rem; height: 1.1rem; }
+  .row[open] .row__icon { transform: rotate(45deg); background: var(--signal); color: var(--ink); box-shadow: none; }
+  .row__more {
+    display: grid;
+    gap: 1rem;
+    padding: 0 3.75rem 2rem 4rem;
+    color: #d4d9d8;
+  }
+  .row__more > p { max-width: 54ch; }
+  .row__inc { display: grid; gap: 0.35rem; font-size: 0.9375rem; color: var(--on-ink-soft); }
+  .row__inc li { display: flex; gap: 0.6rem; }
+  .row__inc li::before { content: "—"; color: var(--signal); }
+  .row__more .link { justify-self: start; color: var(--on-ink); }
+  .row__img { display: none; aspect-ratio: 3 / 2; }
+  :global(html.js-motion) .row[open] .row__more { animation: row-in 520ms var(--ease) both; }
+  @keyframes row-in { from { opacity: 0; transform: translateY(-6px); } }
+
+  .svc__aside { margin-top: 3rem; color: var(--on-ink-soft); max-width: none; }
+  .svc__aside a { color: var(--on-ink); text-decoration-color: var(--signal); text-underline-offset: 0.25em; }
+
+  @media (max-width: 1000px) {
+    .svc__body { grid-template-columns: 1fr; }
+    .svc__preview { display: none; }
+    .row__img { display: block; }
+    .row__more { padding: 0 0 1.75rem 0; }
+    .row summary { grid-template-columns: 2.25rem minmax(0, 1fr) 2.75rem; }
+  }
+</style>

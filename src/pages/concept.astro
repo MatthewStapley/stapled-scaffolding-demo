@@ -1,0 +1,64 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Mark from "../components/Mark.astro";
+import { asset, brand, stapled } from "../data/site";
+
+const photos = [
+  ["Rear extension scaffold", "Brett Jordan", "jEP4vsHrSM8"],
+  ["Long elevation scaffold", "Karen Barrett", "6NrnN_L8Pvg"],
+  ["Classical façade with system scaffold", "Reto Simonet", "WN9QRESOu5c"],
+  ["Church tower scaffold", "Jon McCallon", "NA1_Qyovxrc"],
+  ["System scaffold with stairs", "Etienne Girardet", "y-IbPO2pLS0"],
+  ["City-centre site with sheeting", "Julian Tong", "thAgQthrXU0"],
+  ["Pavement scaffold with barriers", "Pau Ros", "qdbb6ujIO8o"],
+  ["Scaffold beside a chimney stack", "C", "_U9tH0rFJQ8"],
+  ["Scaffolders assembling a tall frame", "Khanh Do", "I_Y9Kpijoyo"],
+  ["Night-lit sheeted scaffold", "Konstantin Kitsenuik", "IGI_LJtO3nI"],
+];
+---
+<Layout title={`About this concept | ${brand.fullName}`}>
+  <main id="main" class="concept paper">
+    <div class="wrap concept__in">
+      <a href={asset("/")} class="concept__home" aria-label="Back to the Transom concept"><Mark /></a>
+      <p class="label"><span class="tick">●</span> Stapled. website concept</p>
+      <h1 class="h2">About this concept</h1>
+      <div class="concept__body">
+        <p class="lede">{brand.fullName} is a fictional scaffolding company. The site was designed and built by <a href={stapled.url}>Stapled.</a> to show what a bespoke website for a scaffolding firm can look like.</p>
+        <h2 class="h3">What's real and what isn't</h2>
+        <ul>
+          <li>The business, its yard, its projects and its contact details are invented.</li>
+          <li>Phone numbers come from ranges Ofcom reserves for drama (0117 496 0xxx and 07700 900xxx), and the email uses the reserved <code>.example</code> domain. Contact buttons explain this instead of calling or messaging.</li>
+          <li>The enquiry form checks what you type but sends and stores nothing.</li>
+          <li>Projects are illustrative. Photographs show other people's buildings and are not presented as anyone's work.</li>
+          <li>There are no reviews, accreditations, client logos or statistics, because a fictional company has none. A real client's genuine ones would go here.</li>
+          <li>The process describes common UK practice, such as scaffold inspections at handover, at least every seven days and after alterations or bad weather, and council licences for scaffolds on the highway. A real firm would confirm the wording for its own work.</li>
+        </ul>
+        <h2 class="h3">Image and video credits</h2>
+        <p>Hero video: “Scaffolding erected on a building under construction” by Kapaw, from <a href="https://www.pexels.com/video/scaffolding-erected-on-a-building-under-construction-3584628/">Pexels</a>, under the Pexels License. Graded and trimmed into a loop for this site.</p>
+        <p>Photographs from Unsplash under the <a href="https://unsplash.com/license">Unsplash License</a>, colour-graded for this site:</p>
+        <ul class="concept__credits">
+          {photos.map(([what, who, id]) => (
+            <li><a href={`https://unsplash.com/photos/${id}`}>{what}</a> <span class="soft">by {who}</span></li>
+          ))}
+        </ul>
+        <p>The elevation drawing, coverage map, icons and Transom mark were drawn for this concept. Fonts: Big Shoulders, Schibsted Grotesk and JetBrains Mono, under the SIL Open Font License.</p>
+        <p><a class="btn" href={stapled.enquiryUrl}>Talk to Stapled. about a site like this</a></p>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .concept { min-height: 100svh; background: var(--paper); color: var(--text); padding-block: 3rem 6rem; }
+  .concept__in { display: grid; gap: 1.5rem; max-width: 52rem; }
+  .concept__home { text-decoration: none; justify-self: start; display: inline-flex; min-height: 2.75rem; align-items: center; margin-bottom: 2rem; }
+  .concept__body { display: grid; gap: 1.25rem; margin-top: 1rem; }
+  .concept__body h2 { margin-top: 1.5rem; }
+  .concept__body ul { display: grid; gap: 0.6rem; }
+  .concept__body li { position: relative; padding-left: 1.6rem; }
+  .concept__body li::before { content: "—"; position: absolute; left: 0; color: var(--signal-ink); }
+  .concept__body a:not(.btn) { text-underline-offset: 0.2em; }
+  .concept__body .btn { margin-top: 1rem; }
+  code { font-family: var(--mono); font-size: 0.9em; }
+  .tick { color: var(--signal-ink); }
+</style>

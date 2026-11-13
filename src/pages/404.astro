@@ -1,0 +1,18 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { asset, brand } from "../data/site";
+---
+<Layout title={`Page not found | ${brand.fullName}`}>
+  <main id="main" class="nf wrap">
+    <p class="label"><span class="tick">●</span> 404</p>
+    <h1 class="display">Nothing<br />on this lift.</h1>
+    <p class="lede soft">That page doesn't exist. The rest of the scaffold is sound.</p>
+    <a class="btn" href={asset("/")}>Back to the start</a>
+  </main>
+</Layout>
+
+<style>
+  .nf { min-height: calc(100svh - var(--bar-h)); display: grid; align-content: center; gap: 1.5rem; }
+  .nf h1 { font-size: clamp(4rem, 14vw, 12rem); }
+  .nf .btn { justify-self: start; }
+</style>

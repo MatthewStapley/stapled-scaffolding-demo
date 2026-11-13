@@ -1,0 +1,258 @@
+---
+import { services } from "../data/content";
+import { brand } from "../data/site";
+import Icon from "./Icon.astro";
+
+const jobTypes = [
+  ...services.map((s) => ({ value: s.slug, label: s.title })),
+  { value: "other", label: "Something else" },
+];
+---
+<section class="quote paper section" id="quote" aria-labelledby="quote-title">
+  <div class="wrap">
+    <p class="kicker label"><b>06</b> Quote</p>
+    <h2 class="h2" id="quote-title">Tell us<br />about the job.</h2>
+  </div>
+
+  <div class="wrap quote__grid">
+    <aside class="direct" aria-labelledby="direct-title">
+      <h3 class="label" id="direct-title">Talk to the yard</h3>
+      <a class="direct__phone" href={brand.phoneHref} data-contact="phone">
+        <span class="label soft">Call</span>
+        <span class="direct__num">{brand.phone}</span>
+      </a>
+      <ul class="direct__list">
+        <li>
+          <a href={brand.whatsappHref} data-contact="whatsapp">
+            <Icon name="chat" />
+            <span><b>WhatsApp</b><span class="soft">Send photos of the building. It's often the quickest way to a price.</span></span>
+          </a>
+        </li>
+        <li>
+          <a href={`mailto:${brand.email}`} data-contact="email">
+            <Icon name="mail" />
+            <span><b>Email</b><span class="soft">{brand.email}</span></span>
+          </a>
+        </li>
+        <li>
+          <span class="direct__static">
+            <Icon name="pin" />
+            <span><b>Yard</b><span class="soft">{brand.yard}. {brand.hours}.</span></span>
+          </span>
+        </li>
+      </ul>
+      <p class="direct__note label">Demo: these open an explanation instead of a real call or message.</p>
+    </aside>
+
+    <form class="form" data-enquiry novalidate aria-describedby="form-note">
+      <fieldset class="field field--full">
+        <legend class="field__label">What's the job? <span class="req">Required</span></legend>
+        <div class="chips">
+          {jobTypes.map((j) => (
+            <label class="chip">
+              <input type="radio" name="job" value={j.value} required />
+              <span>{j.label}</span>
+            </label>
+          ))}
+        </div>
+        <p class="field__error" id="err-job" data-error="job"></p>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="f-name">Your name <span class="req">Required</span></label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="err-name" />
+        <p class="field__error" id="err-name" data-error="name"></p>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="f-postcode">Site postcode <span class="req">Required</span></label>
+        <input id="f-postcode" name="postcode" type="text" autocomplete="postal-code" required aria-describedby="err-postcode" class="mono" />
+        <p class="field__error" id="err-postcode" data-error="postcode"></p>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="f-phone">Phone</label>
+        <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="hint-contact err-contact" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="f-email">Email</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" aria-describedby="hint-contact err-contact" />
+      </div>
+      <p class="field__hint field--full" id="hint-contact">A phone number or an email, whichever you prefer.</p>
+      <p class="field__error field--full" id="err-contact" data-error="contact"></p>
+
+      <div class="field">
+        <label class="field__label" for="f-when">When do you need it?</label>
+        <div class="select">
+          <select id="f-when" name="when">
+            <option value="">Choose…</option>
+            <option>As soon as possible</option>
+            <option>Within a month</option>
+            <option>In one to three months</option>
+            <option>Just planning for now</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="f-how">How should we reply?</label>
+        <div class="select">
+          <select id="f-how" name="reply">
+            <option>Phone call</option>
+            <option>WhatsApp</option>
+            <option>Email</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field field--full">
+        <label class="field__label" for="f-msg">Anything else we should know?</label>
+        <textarea id="f-msg" name="message" rows="4" placeholder="Which sides of the building, rough height, access from the road, what the scaffold is for…"></textarea>
+      </div>
+
+      <div class="form__foot field--full">
+        <button class="btn btn--dark" type="submit">Send enquiry <Icon name="arrow" /></button>
+        <p class="form__note" id="form-note">This is a concept site, so nothing you enter is sent or stored.</p>
+      </div>
+
+      <div class="form__done" data-done hidden tabindex="-1">
+        <span class="form__tick" aria-hidden="true"><Icon name="check" /></span>
+        <h3 class="h3">Enquiry checked.<br />Not sent.</h3>
+        <p data-done-text>On a live site this would go straight to the yard, and someone would reply the way you asked.</p>
+        <p class="soft">Transom is a fictional business, so nothing was sent or stored.</p>
+        <button class="link" type="button" data-reset>Start again</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .quote__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* Direct contact panel */
+  .direct {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: var(--ink);
+    color: var(--on-ink);
+    color-scheme: dark;
+  }
+  .direct > .label { color: var(--signal); }
+  .direct__phone { display: grid; gap: 0.25rem; text-decoration: none; padding-bottom: 1.25rem; border-bottom: 1px solid var(--rule-ink); }
+  .direct__num {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 1.6rem + 1.8vw, 3.2rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    transition: color 200ms;
+  }
+  .direct__phone:hover .direct__num { color: var(--signal); }
+  .direct__list { display: grid; }
+  .direct__list li + li { border-top: 1px solid var(--rule-ink); }
+  .direct__list a, .direct__static { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.85rem; padding: 0.9rem 0; text-decoration: none; }
+  .direct__list :global(svg) { width: 1.3rem; height: 1.3rem; color: var(--signal); margin-top: 0.1rem; }
+  .direct__list b { display: block; font-weight: 650; }
+  .direct__list .soft { display: block; font-size: 0.9375rem; color: var(--on-ink-soft); }
+  .direct__list a:hover b { text-decoration: underline; text-decoration-color: var(--signal); text-underline-offset: 0.2em; }
+  .direct__note { font-size: 0.625rem; color: var(--steel); text-transform: none; letter-spacing: 0.02em; }
+
+  /* Form */
+  .form {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 1.5rem;
+  }
+  .field { display: grid; gap: 0.45rem; align-content: start; min-width: 0; border: 0; padding: 0; margin: 0; }
+  .field--full { grid-column: 1 / -1; }
+  .field__label { font-weight: 600; font-size: 0.9375rem; padding: 0; }
+  .req { margin-left: 0.4rem; font-family: var(--mono); font-size: 0.625rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); }
+  .field input, .field textarea, .select select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #b9b7af;
+    border-radius: 2px;
+    background: #f7f6f2;
+    color: var(--text);
+    font-size: 1rem;
+    transition: border-color 200ms, box-shadow 200ms;
+  }
+  .field textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
+  .field input.mono { font-family: var(--mono); text-transform: uppercase; }
+  .field input:hover, .field textarea:hover, .select select:hover { border-color: #8f8d86; }
+  .field input:focus-visible, .field textarea:focus-visible, .select select:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), 0 0 0 4px #ff5b1f55; }
+  .field [aria-invalid="true"] { border-color: #b3261e; box-shadow: 0 0 0 1px #b3261e; }
+  .select { position: relative; }
+  .select select { appearance: none; padding-right: 2.5rem; }
+  .select::after { content: ""; position: absolute; right: 1rem; top: 50%; width: 0.5rem; height: 0.5rem; border-right: 1.5px solid; border-bottom: 1.5px solid; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+  .field__hint { margin-top: -0.9rem; font-size: 0.875rem; color: var(--text-soft); }
+  .field__error { font-size: 0.875rem; font-weight: 600; color: #b3261e; min-height: 0; }
+  .field__error:empty { display: none; }
+  p.field__error.field--full { margin-top: -0.9rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.2rem; }
+  .chip { position: relative; }
+  .chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid #b9b7af;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 550;
+    transition: background-color 200ms, color 200ms, border-color 200ms;
+  }
+  .chip:hover span { border-color: var(--ink); }
+  .chip input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .chip input:checked + span::before { content: ""; width: 0.45rem; height: 0.45rem; margin-right: 0.55rem; background: var(--signal); border-radius: 50%; }
+  .chip input:focus-visible + span { outline: 2px solid var(--signal-ink); outline-offset: 2px; }
+  fieldset[aria-invalid="true"] .chip span { border-color: #b3261e; }
+
+  .form__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; padding-top: 0.5rem; }
+  .form__note { font-size: 0.875rem; color: var(--text-soft); }
+
+  .form__done {
+    position: absolute;
+    inset: -0.5rem;
+    z-index: 2;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 1rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background: var(--paper);
+    border: 1px solid var(--rule-paper);
+  }
+  .form__done[hidden] { display: none; }
+  .form__done:focus { outline: none; }
+  .form__tick { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ink); color: var(--signal); }
+  .form__tick :global(svg) { width: 1.6rem; height: 1.6rem; }
+  .form__done p { max-width: 46ch; }
+  :global(html.js-motion) .form__done:not([hidden]) { animation: done-in 600ms var(--ease) both; }
+  :global(html.js-motion) .form__done:not([hidden]) .form__tick svg path { stroke-dasharray: 30; animation: tick-draw 600ms 200ms var(--ease) both; }
+  @keyframes done-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes tick-draw { from { stroke-dashoffset: 30; } }
+
+  @media (max-width: 900px) {
+    .quote__grid { grid-template-columns: 1fr; }
+    .direct { position: static; order: 2; }
+  }
+  @media (max-width: 560px) {
+    .form { grid-template-columns: 1fr; }
+    .form__foot .btn { width: 100%; }
+  }
+</style>

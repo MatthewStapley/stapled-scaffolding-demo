@@ -1,0 +1,176 @@
+---
+import { towns, yard } from "../data/content";
+import { brand } from "../data/site";
+
+// Equirectangular projection centred on the Bristol area. 1 mile ≈ 13 units.
+const K = 900;
+const COS = Math.cos((51.45 * Math.PI) / 180);
+const px = (lat: number, lon: number) => [400 + (lon + 2.62) * COS * K, 300 - (lat - 51.45) * K] as const;
+const path = (pts: [number, number][], close = false) =>
+  pts.map(([la, lo], i) => `${i ? "L" : "M"}${px(la, lo).map((n) => n.toFixed(1)).join(" ")}`).join("") + (close ? "Z" : "");
+const MILE = K / 69;
+
+const water = path([
+  [51.18, -3.5], [51.2, -3.13], [51.24, -3.0], [51.325, -3.02], [51.35, -2.985], [51.375, -2.95], [51.44, -2.865],
+  [51.49, -2.77], [51.505, -2.71], [51.56, -2.665], [51.6, -2.62], [51.63, -2.575], [51.69, -2.49], [51.8, -2.42],
+  [51.8, -2.47], [51.72, -2.53], [51.64, -2.67], [51.58, -2.75], [51.545, -2.9], [51.54, -2.98], [51.45, -3.16],
+  [51.4, -3.17], [51.39, -3.27], [51.38, -3.5],
+], true);
+const roads = [
+  { name: "M5", d: path([[51.1, -2.98], [51.35, -2.92], [51.43, -2.83], [51.47, -2.72], [51.495, -2.695], [51.55, -2.565], [51.63, -2.47], [51.78, -2.33]]) },
+  { name: "M4", d: path([[51.575, -2.7], [51.55, -2.565], [51.53, -2.38], [51.52, -2.14], [51.52, -1.9]]) },
+  { name: "M32", d: path([[51.515, -2.53], [51.465, -2.58]]) },
+];
+const [yx, yy] = px(yard.lat, yard.lon);
+const rings = [10, 20, 30].map((m) => ({ m, r: m * MILE }));
+const placed = towns.map((t) => {
+  const [x, y] = px(t.lat, t.lon);
+  return { ...t, x, y, slug: t.name.toLowerCase().replace(/[^a-z]+/g, "-") };
+});
+// Label offsets to keep names clear of each other.
+const offset: Record<string, [number, number, "start" | "end"]> = {
+  "weston-super-mare": [10, 18, "start"], clevedon: [-10, 4, "end"], portishead: [-10, -6, "end"], nailsea: [10, 14, "start"],
+  bristol: [12, -8, "start"], keynsham: [10, 14, "start"], bath: [12, 4, "start"], thornbury: [10, 4, "start"],
+  yate: [10, 4, "start"], "midsomer-norton": [10, 4, "start"], chippenham: [-10, 4, "end"], frome: [10, 4, "start"], wells: [-10, 4, "end"],
+};
+---
+<section class="cov section" id="coverage" aria-labelledby="cov-title">
+  <div class="wrap cov__grid">
+    <div class="cov__text">
+      <p class="kicker label"><b>05</b> Coverage</p>
+      <h2 class="h2" id="cov-title">Bristol, Bath<br />and around.</h2>
+      <p class="lede soft">We work from a yard near Avonmouth, a short run from the M5 and M4. Most of our jobs are within about twenty miles of it.</p>
+
+      <form class="pc" data-postcode novalidate>
+        <label for="pc-input" class="label">Check your postcode</label>
+        <div class="pc__row">
+          <input id="pc-input" name="postcode" type="text" inputmode="text" autocomplete="postal-code" placeholder="e.g. BS8 1AB" spellcheck="false" />
+          <button type="submit" class="btn">Check</button>
+        </div>
+        <p class="pc__out" data-postcode-out aria-live="polite"></p>
+      </form>
+
+      <ul class="cov__towns" aria-label="Places we regularly cover">
+        {placed.filter((t) => !t.edge).map((t) => <li><button type="button" data-town={t.slug}>{t.name}</button></li>)}
+      </ul>
+      <p class="cov__ask soft">Further out? <a href={brand.phoneHref} data-contact="phone">Call {brand.phone}</a> and ask.</p>
+    </div>
+
+    <figure class="cov__map">
+      <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="map-title">
+        <title id="map-title">Schematic map of the area around Bristol, with distance rings at 10, 20 and 30 miles from the yard near Avonmouth</title>
+        <defs>
+          <clipPath id="map-clip"><rect width="800" height="600" /></clipPath>
+          <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M40 0H0V40" fill="none" stroke="var(--rule-ink)" stroke-width="0.6" />
+          </pattern>
+        </defs>
+        <g clip-path="url(#map-clip)">
+          <rect width="800" height="600" fill="url(#map-grid)" />
+          <path d={water} class="water" />
+          <text x="150" y="250" class="map-faint">Severn Estuary</text>
+          <text x="96" y="120" class="map-faint">Wales</text>
+          {roads.map((r) => <path d={r.d} class="road" />)}
+          {rings.map((g) => (
+            <g class="ring" data-ring>
+              <circle cx={yx} cy={yy} r={g.r} />
+              <text x={yx + g.r * 0.707 + 4} y={yy + g.r * 0.707 + 12} class="ring-label">{g.m} mi</text>
+            </g>
+          ))}
+          {placed.map((t) => {
+            const [dx, dy, anchor] = offset[t.slug] ?? [10, 4, "start"];
+            return (
+              <g class:list={["town", { "town--edge": t.edge, "town--big": t.size > 1 }]} data-town-dot={t.slug}>
+                <circle cx={t.x} cy={t.y} r={t.size > 2 ? 5 : t.size > 1 ? 4 : 3} />
+                <text x={t.x + dx} y={t.y + dy} text-anchor={anchor}>{t.name}</text>
+              </g>
+            );
+          })}
+          <g class="yard">
+            <rect x={yx - 7} y={yy - 7} width="14" height="14" />
+            <text x={yx + 12} y={yy - 10}>Yard</text>
+          </g>
+        </g>
+      </svg>
+      <figcaption class="label soft">Schematic. Coastline and roads simplified · M5, M4, M32 shown</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .cov { background: var(--ink); }
+  .cov__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .cov__text { display: grid; gap: 1.5rem; align-content: start; }
+  .cov__text .kicker { margin-bottom: 0.5rem; }
+
+  .pc { display: grid; gap: 0.6rem; margin-top: 1rem; }
+  .pc label { color: var(--on-ink-soft); }
+  .pc__row { display: flex; gap: 0.5rem; }
+  .pc input {
+    flex: 1;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 1px solid var(--rule-ink);
+    border-radius: 2px;
+    background: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+  .pc input::placeholder { color: var(--steel-2); text-transform: none; font-family: var(--sans); }
+  .pc input:focus-visible { outline-offset: 0; border-color: var(--signal); }
+  .pc__out { min-height: 1.5em; font-size: 0.9375rem; }
+  .pc__out b { color: var(--signal); font-weight: 600; }
+  .pc__out.is-in b { color: var(--ok); }
+
+  .cov__towns { display: flex; flex-wrap: wrap; gap: 0.25rem 0.4rem; }
+  .cov__towns button {
+    min-height: 2.25rem;
+    padding: 0 0.7rem;
+    border: 1px solid var(--rule-ink);
+    border-radius: 999px;
+    background: none;
+    font-size: 0.875rem;
+    color: var(--on-ink-soft);
+    transition: color 200ms, border-color 200ms, background-color 200ms;
+  }
+  .cov__towns button:hover, .cov__towns button.is-on { color: var(--ink); background: var(--on-ink); border-color: var(--on-ink); }
+  .cov__ask a { color: var(--on-ink); text-decoration-color: var(--signal); text-underline-offset: 0.25em; }
+
+  .cov__map { display: grid; gap: 0.75rem; }
+  .cov__map svg { width: 100%; height: auto; border: 1px solid var(--rule-ink); background: var(--ink-2); }
+  .cov__map figcaption { font-size: 0.625rem; }
+  .water { fill: #1c2a30; stroke: #36505a; stroke-width: 1; }
+  .map-faint { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; fill: #4f6a74; }
+  .road { fill: none; stroke: #4a5357; stroke-width: 2.2; stroke-linejoin: round; }
+  .ring circle { fill: none; stroke: var(--signal); stroke-width: 1; stroke-dasharray: 3 5; opacity: 0.75; }
+  .ring:first-of-type circle { stroke-dasharray: none; }
+  .ring-label { font-family: var(--mono); font-size: 10px; fill: var(--signal); }
+  .town circle { fill: var(--on-ink); transition: r 300ms var(--ease), fill 200ms; }
+  .town text { font-size: 13px; font-weight: 550; fill: var(--on-ink); paint-order: stroke; stroke: var(--ink-2); stroke-width: 4px; transition: fill 200ms; }
+  .town--big text { font-size: 16px; font-weight: 700; }
+  .town--edge circle { fill: none; stroke: var(--on-ink-soft); stroke-width: 1.2; }
+  .town--edge text { fill: var(--on-ink-soft); font-weight: 450; }
+  .town.is-on circle { fill: var(--signal); r: 7; }
+  .town.is-on text { fill: var(--signal); }
+  .yard rect { fill: var(--signal); }
+  .yard text { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--signal); text-transform: uppercase; letter-spacing: 0.1em; paint-order: stroke; stroke: var(--ink-2); stroke-width: 4px; }
+
+  :global(html.js-motion) .ring circle { transform-box: fill-box; transform-origin: center; }
+
+  @media (max-width: 900px) {
+    .cov__grid { grid-template-columns: 1fr; }
+    .cov__map { margin-inline: calc(var(--gutter) * -1); }
+    .cov__map svg { border-inline: 0; height: min(118vw, 34rem); }
+    .town text { font-size: 18px; }
+    .town--big text { font-size: 21px; }
+    .map-faint, .ring-label, .yard text { font-size: 14px; }
+    .cov__map figcaption { padding-inline: var(--gutter); }
+  }
+</style>

@@ -1,0 +1,103 @@
+---
+import { projects } from "../data/content";
+import Photo from "./Photo.astro";
+import Icon from "./Icon.astro";
+---
+<section class="work paper section" id="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <p class="kicker label"><b>04</b> Work</p>
+    <div class="work__head">
+      <h2 class="h2" id="work-title">Scaffolds<br />we'd be proud of.</h2>
+      <p class="work__disclaimer label">
+        Illustrative projects. Transom is fictional, so these show the kind of work a scaffolding firm
+        would feature here, using licensed photographs of other people's buildings.
+      </p>
+    </div>
+  </div>
+
+  <ol class="work__list">
+    {projects.map((p, i) => (
+      <li class:list={["proj", `proj--${i % 4}`]}>
+        <div class="proj__media">
+          <Photo image={p.image} sizes="(max-width: 800px) 100vw, 64vw" slats parallax tag="Illustrative project" />
+        </div>
+        <div class="proj__text">
+          <p class="proj__meta label"><span class="tick">{String(i + 1).padStart(2, "0")}</span> {p.kind} · {p.where}</p>
+          <h3 class="h3">{p.title}</h3>
+          <p class="proj__sum">{p.summary}</p>
+          <ul class="proj__scope">
+            {p.scope.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <div class="wrap work__end">
+    <p class="h3">Got a job like these?</p>
+    <a class="btn btn--dark" href="#quote">Tell us about it <Icon name="arrow" /></a>
+  </div>
+</section>
+
+<style>
+  .work__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem 3rem;
+    margin-bottom: clamp(3rem, 7vw, 6rem);
+  }
+  .work__disclaimer { max-width: 44ch; line-height: 1.6; color: var(--text-soft); text-transform: none; letter-spacing: 0.01em; font-size: 0.75rem; }
+
+  .work__list { display: grid; gap: clamp(5rem, 10vw, 9rem); }
+  .proj {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2.5vw, 2.5rem);
+    padding-inline: var(--gutter);
+    align-items: end;
+  }
+  .proj__media :global(.frame) { aspect-ratio: 3 / 2; }
+  .proj__media :global(img) { transform-origin: 50% 50%; }
+  .proj__text { display: grid; gap: 0.9rem; align-content: end; padding-bottom: 0.25rem; }
+  .proj__meta { color: var(--text-soft); }
+  .proj__sum { color: var(--text-soft); max-width: 42ch; }
+  .proj__scope { display: grid; gap: 0.3rem; padding-top: 0.9rem; border-top: 1px solid var(--rule-paper); font-size: 0.9375rem; }
+  .proj__scope li { display: flex; gap: 0.6rem; }
+  .proj__scope li::before { content: "—"; color: var(--signal-ink); }
+
+  /* Four compositions, so the list never reads as a repeated card. */
+  .proj--0 .proj__media { grid-column: 1 / span 12; margin-inline: calc(var(--gutter) * -1); }
+  .proj--0 .proj__media :global(.frame) { aspect-ratio: 21 / 9; }
+  .proj--0 .proj__text { grid-column: 7 / span 5; margin-top: -6rem; padding: 2rem 2rem 1.5rem; background: var(--paper); position: relative; }
+  .proj--1 .proj__media { grid-column: 6 / span 7; grid-row: 1; }
+  .proj--1 .proj__media :global(.frame) { aspect-ratio: 4 / 5; }
+  .proj--1 .proj__text { grid-column: 1 / span 4; grid-row: 1; align-self: center; }
+  .proj--2 .proj__media { grid-column: 1 / span 7; }
+  .proj--2 .proj__text { grid-column: 9 / span 4; }
+  .proj--3 .proj__media { grid-column: 3 / span 10; }
+  .proj--3 .proj__media :global(.frame) { aspect-ratio: 16 / 9; }
+  .proj--3 .proj__text { grid-column: 3 / span 5; margin-top: 2rem; }
+
+  .work__end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: clamp(5rem, 9vw, 8rem);
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule-paper);
+  }
+
+  @media (max-width: 800px) {
+    .proj { grid-template-columns: 1fr; row-gap: 1.5rem; }
+    .proj .proj__media, .proj .proj__text { grid-column: 1 !important; grid-row: auto !important; margin: 0 !important; }
+    .proj--0 .proj__media { margin-inline: calc(var(--gutter) * -1) !important; }
+    .proj--0 .proj__media :global(.frame) { aspect-ratio: 4 / 3; }
+    .proj--0 .proj__text { padding: 0; }
+    .proj--1 .proj__media :global(.frame) { aspect-ratio: 4 / 5; }
+    .proj--1 .proj__media { width: 86%; justify-self: end; }
+  }
+</style>

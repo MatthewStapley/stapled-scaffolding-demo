@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "transom-dev", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "--", "--port", "4331"], "port": 4331 },
+    { "name": "transom-preview", "runtimeExecutable": "npm", "runtimeArgs": ["run", "preview", "--", "--port", "4341"], "port": 4341 }
+  ]
+}

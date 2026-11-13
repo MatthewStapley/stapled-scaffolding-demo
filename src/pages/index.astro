@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Intro from "../components/Intro.astro";
+import Services from "../components/Services.astro";
+import Method from "../components/Method.astro";
+import Work from "../components/Work.astro";
+import Night from "../components/Night.astro";
+import Coverage from "../components/Coverage.astro";
+import Quote from "../components/Quote.astro";
+import Footer from "../components/Footer.astro";
+import ContactDialog from "../components/ContactDialog.astro";
+import { asset } from "../data/site";
+---
+<Layout>
+  <link slot="head" rel="preload" as="image" href={asset("/video/facade-wide.webp")} media="(min-aspect-ratio: 4/5)" />
+  <link slot="head" rel="preload" as="image" href={asset("/video/facade-tall.webp")} media="(max-aspect-ratio: 4/5)" />
+  <Header />
+  <main id="main">
+    <Hero />
+    <Intro />
+    <Services />
+    <Method />
+    <Work />
+    <Night />
+    <Coverage />
+    <Quote />
+  </main>
+  <Footer />
+  <ContactDialog />
+  <script>
+    import "../scripts/main";
+  </script>
+</Layout>

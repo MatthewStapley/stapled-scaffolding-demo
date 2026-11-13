@@ -1,0 +1,48 @@
+---
+import "@fontsource-variable/big-shoulders/opsz.css";
+import "@fontsource-variable/schibsted-grotesk";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import DemoBar from "../components/DemoBar.astro";
+import { asset, brand } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = `${brand.fullName} | Scaffolding in ${brand.area}`,
+  description = `${brand.fullName} is a fictional scaffolding company, created by Stapled. as a website design concept.`,
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0d0f10" />
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={asset("/video/facade-wide.webp")} />
+    <script is:inline>
+      // Motion classes before first paint, so nothing flashes or jumps.
+      (function () {
+        var d = document.documentElement;
+        d.classList.add("js");
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("js-motion");
+        // If the motion script never starts, show everything rather than hide it.
+        setTimeout(function () { if (!window.__motionReady) d.classList.remove("js-motion"); }, 4000);
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <DemoBar />
+    <slot />
+  </body>
+</html>

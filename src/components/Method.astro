@@ -1,0 +1,269 @@
+---
+// "Lift by lift": a scale elevation of a Georgian townhouse that is surveyed,
+// planned, scaffolded, handed over, adapted and struck as the six stages are read.
+// Every animated element carries data-a="start,end" (drawn or faded in over that
+// slice of the section's progress, 0–1) and optionally data-z (removed again).
+// src/scripts/method.ts drives them. Without JS the finished scaffold is shown.
+import { steps } from "../data/content";
+import { brand } from "../data/site";
+import Icon from "./Icon.astro";
+
+type Part = { d: string; c: string; a: [number, number]; z?: [number, number]; k?: "d" | "f" };
+const parts: Part[] = [];
+const L = (x1: number, y1: number, x2: number, y2: number) => `M${x1} ${y1}L${x2} ${y2}`;
+const R = (x: number, y: number, w: number, h: number) => `M${x} ${y}h${w}v${h}h${-w}z`;
+const add = (d: string, c: string, a: [number, number], z?: [number, number], k: "d" | "f" = "d") =>
+  parts.push({ d, c, a, z, k });
+
+const G = 610; // ground
+
+// ---- 01 Survey: the house and its neighbours --------------------------------
+const house = [
+  L(150, G, 150, 280), L(450, G, 450, 280), L(142, 280, 458, 280), L(142, 292, 458, 292),
+  L(150, 280, 205, 215), L(205, 215, 395, 215), L(395, 215, 450, 280),
+  R(178, 182, 28, 50), R(394, 182, 28, 50),
+  L(150, 500, 450, 500),
+];
+house.forEach((d, i) => add(d, "house", [0.005 + i * 0.006, 0.07 + i * 0.006]));
+const windows: string[] = [];
+for (const x of [200, 300, 400]) {
+  windows.push(R(x - 22, 420, 44, 70)); // first floor
+  windows.push(R(x - 18, 328, 36, 50)); // second floor
+}
+for (const x of [200, 400]) windows.push(R(x - 22, 522, 44, 64));
+windows.push(R(280, 532, 40, 78)); // door
+windows.push("M280 532a20 20 0 0 1 40 0"); // fanlight
+windows.forEach((d, i) => add(d, "house house--thin", [0.04 + i * 0.004, 0.1 + i * 0.004]));
+// neighbours, fainter
+const nb = [L(0, 280, 150, 280), L(0, 292, 150, 292), L(450, 280, 600, 280), L(450, 292, 600, 292), L(0, 500, 150, 500), L(450, 500, 600, 500)];
+for (const x of [50, 110, 500, 560]) { nb.push(R(x - 18, 420, 36, 70), R(x - 15, 328, 30, 50), R(x - 18, 522, 36, 64)); }
+nb.forEach((d) => add(d, "neighbour", [0.02, 0.12]));
+add(L(0, G, 600, G), "ground", [0, 0.06]);
+
+// survey dimensions
+const dims = [L(492, G, 492, 280), L(486, G, 498, G), L(486, 280, 498, 280), L(150, 638, 450, 638), L(150, 632, 150, 644), L(450, 632, 450, 644)];
+dims.forEach((d) => add(d, "dim", [0.08, 0.15], [0.335, 0.36]));
+
+// ---- 02 Plan ------------------------------------------------------------------
+const STD = [135, 215, 295, 375, 455];
+STD.forEach((x, i) => add(`M${x - 6} ${G + 9}l6 -7 6 7z`, "mark", [0.19 + i * 0.01, 0.21 + i * 0.01], [0.34, 0.36], "f"));
+add(R(127, 255, 336, G - 255), "envelope", [0.2, 0.27], [0.335, 0.36], "f");
+const ties = [[215, 482], [375, 482], [215, 354], [375, 354]];
+ties.forEach(([x, y], i) => add(`M${x - 6} ${y - 6}l12 12M${x + 6} ${y - 6}l-12 12`, "tie", [0.24 + i * 0.015, 0.27 + i * 0.015], [0.955, 0.97]));
+
+// ---- 03 Erect: sole boards, then five lifts --------------------------------------
+STD.forEach((x) => add(L(x - 11, G + 3, x + 11, G + 3), "sole", [0.336, 0.342], [0.975, 0.99]));
+const E0 = 0.343, E1 = 0.497, per = (E1 - E0) / 5;
+const strikeEnd = 0.965, strikeStart = 0.875, sper = (strikeEnd - strikeStart) / 5;
+for (let k = 1; k <= 5; k++) {
+  const y = G - 64 * k, yp = y + 64, top = k === 5 ? 255 : y;
+  const s = E0 + per * (k - 1);
+  const at = (f0: number, f1: number): [number, number] => [s + per * f0, s + per * f1];
+  const zs = strikeStart + sper * (5 - k);
+  const z = (f0: number, f1: number): [number, number] => [zs + sper * f0, zs + sper * f1];
+  STD.forEach((x) => add(L(x, yp, x, top), "std", at(0, 0.45), z(0.55, 1)));
+  add(L(127, y, 463, y), "ledger", at(0.3, 0.7), z(0.4, 0.8));
+  add(L(135, y - 2.5, 455, y - 2.5), "board", at(0.45, 0.85), z(0.2, 0.55));
+  add(L(135, y - 30, 455, y - 30), "rail", at(0.6, 1), z(0, 0.4));
+  add(L(135, y - 16, 455, y - 16), "rail rail--mid", at(0.65, 1), z(0, 0.4));
+  // face bracing zig-zags up the end bays
+  const [a, b] = k % 2 ? [135, 215] : [215, 135];
+  add(L(a, yp, b, y), "brace", at(0.55, 0.95), z(0.3, 0.7));
+  const [c, d] = k % 2 ? [455, 375] : [375, 455];
+  add(L(c, yp, d, y), "brace", at(0.55, 0.95), z(0.3, 0.7));
+  // ladder in the second bay, alternating sides
+  const lx = k % 2 ? 232 : 270;
+  let ladder = `${L(lx, yp, lx, y - 30)}${L(lx + 12, yp, lx + 12, y - 30)}`;
+  for (let r = yp - 8; r > y - 30; r -= 9) ladder += L(lx, r, lx + 12, r);
+  add(ladder, "ladder", at(0.5, 0.95), z(0.1, 0.5), "f");
+}
+
+// ---- 04 Hand over: inspection sweep and tag --------------------------------------
+add(L(118, 0, 472, 0), "sweep", [0.515, 0.525], [0.615, 0.63], "f");
+add(R(460, 540, 38, 50), "tag", [0.6, 0.625], [0.845, 0.86], "f");
+
+// ---- 05 Adapt: temporary roof and sheeting ---------------------------------------
+add(R(127, 255, 336, G - 255 - 64), "sheet", [0.72, 0.8], [0.845, 0.865], "f");
+const roof = [L(118, 258, 295, 168), L(295, 168, 472, 258), L(118, 258, 472, 258), L(215, 258, 215, 209), L(295, 258, 295, 168), L(375, 258, 375, 209), L(215, 258, 295, 168), L(375, 258, 295, 168)];
+roof.forEach((d, i) => add(d, "troof", [0.685 + i * 0.006, 0.72 + i * 0.006], [0.845, 0.87]));
+add("M118 258L295 168L472 258z", "troof-fill", [0.73, 0.78], [0.845, 0.865], "f");
+
+const stageNames = steps.map((s) => s.title);
+---
+<section class="method" id="method" aria-labelledby="method-title" data-method>
+  <div class="wrap method__head section">
+    <p class="kicker label"><b>03</b> Method</p>
+    <h2 class="h2" id="method-title">Lift by lift.</h2>
+    <p class="lede soft">How a Transom scaffold goes up, stays safe and comes down again. Scroll through the six stages and watch it happen on a typical townhouse.</p>
+  </div>
+
+  <div class="method__body wrap">
+    <div class="method__stage">
+      <div class="method__drawing">
+        <div class="method__hud label">
+          <span>Stage <b data-m-stage>03</b> / 06 · <span data-m-name>{stageNames[2]}</span></span>
+          <span>Lifts <b data-m-lifts>5</b> / 5</span>
+        </div>
+        <svg viewBox="20 150 560 512" role="img" aria-labelledby="m-svg-title" data-m-svg>
+          <title id="m-svg-title">Elevation drawing of a three-storey townhouse with a five-lift scaffold in front of it</title>
+          <defs>
+            <pattern id="sheet-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(90)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--on-ink)" stroke-width="1.2" />
+            </pattern>
+            <linearGradient id="sweep-glow" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stop-color="var(--signal)" stop-opacity="0" />
+              <stop offset="1" stop-color="var(--signal)" stop-opacity="0.35" />
+            </linearGradient>
+          </defs>
+          <g data-m-sweep-wrap>
+            <rect x="118" y="-40" width="354" height="40" fill="url(#sweep-glow)" class="sweep-glow" data-m-sweep-glow />
+          </g>
+          {parts.map((p) => (
+            <path
+              d={p.d}
+              class={p.c}
+              pathLength={p.k === "d" ? 1 : undefined}
+              data-k={p.k}
+              data-a={p.a.join(",")}
+              data-z={p.z ? p.z.join(",") : undefined}
+            />
+          ))}
+          <g class="tag-text" aria-hidden="true">
+            <text x="479" y="560" text-anchor="middle">SAFE</text>
+            <text x="479" y="572" text-anchor="middle">TO USE</text>
+          </g>
+          <g class="dim-text" aria-hidden="true">
+            <text x="504" y="448" transform="rotate(-90 504 448)">10.3 m</text>
+            <text x="300" y="654" text-anchor="middle">9.4 m</text>
+          </g>
+        </svg>
+        <p class="method__caption label soft">Illustrative elevation · not to scale for any real building</p>
+      </div>
+    </div>
+
+    <ol class="method__steps">
+      {steps.map((s, i) => (
+        <li class="step" data-step={i}>
+          <p class="step__no">{s.no}</p>
+          <h3 class="h3">{s.title}</h3>
+          <p class="step__body">{s.body}</p>
+          <p class="step__note label"><span class="tick">■</span> {s.note}</p>
+          {i === 0 && (
+            <a class="link step__link" href={brand.phoneHref} data-contact="phone"><Icon name="phone" />Book a site visit</a>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .method { background: var(--ink-2); }
+  .method__head { padding-bottom: clamp(2rem, 5vw, 4rem); }
+  .method__head .lede { margin-top: 1.5rem; }
+
+  .method__body {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 5vw, 6rem);
+    padding-bottom: var(--section);
+  }
+  .method__stage { position: relative; }
+  .method__drawing {
+    position: sticky;
+    top: calc(var(--header-h) + 1rem);
+    height: calc(100svh - var(--header-h) - 2rem);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--rule-ink);
+    background:
+      linear-gradient(var(--rule-ink) 1px, transparent 1px) 0 0 / 100% 2rem,
+      linear-gradient(90deg, var(--rule-ink) 1px, transparent 1px) 0 0 / 2rem 100%;
+    background-color: var(--ink-2);
+    background-blend-mode: normal;
+  }
+  .method__drawing::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--ink-2) 82%, transparent);
+    pointer-events: none;
+  }
+  .method__drawing > * { position: relative; }
+  .method__hud { display: flex; justify-content: space-between; gap: 1rem; color: var(--on-ink-soft); }
+  .method__hud b { color: var(--signal); font-weight: 600; }
+  .method__drawing :global(svg) { width: 100%; height: 100%; min-height: 0; overflow: visible; }
+  .method__caption { font-size: 0.625rem; }
+
+  /* Drawing styles */
+  svg :global(path) { fill: none; stroke-linecap: square; }
+  svg :global(.house) { stroke: var(--on-ink); stroke-width: 1.6; }
+  svg :global(.house--thin) { stroke-width: 1.1; stroke: color-mix(in srgb, var(--on-ink) 70%, transparent); }
+  svg :global(.neighbour) { stroke: color-mix(in srgb, var(--on-ink) 22%, transparent); stroke-width: 1; }
+  svg :global(.ground) { stroke: var(--on-ink-soft); stroke-width: 1.4; }
+  svg :global(.dim) { stroke: var(--on-ink-soft); stroke-width: 1; }
+  svg :global(.mark) { fill: var(--signal); stroke: none; }
+  svg :global(.envelope) { stroke: var(--signal); stroke-width: 1.2; stroke-dasharray: 6 5; }
+  svg :global(.tie) { stroke: var(--signal); stroke-width: 2.2; }
+  svg :global(.sole) { stroke: #9a7b55; stroke-width: 4; }
+  svg :global(.std) { stroke: #c9d0d2; stroke-width: 3; }
+  svg :global(.ledger) { stroke: #c9d0d2; stroke-width: 2.4; }
+  svg :global(.board) { stroke: #a8865a; stroke-width: 5; stroke-linecap: butt; }
+  svg :global(.rail) { stroke: #c9d0d2; stroke-width: 2; }
+  svg :global(.rail--mid) { stroke-width: 1.5; }
+  svg :global(.brace) { stroke: #9aa3a6; stroke-width: 1.8; }
+  svg :global(.ladder) { stroke: #8b9499; stroke-width: 1.4; }
+  svg :global(.sweep) { stroke: var(--signal); stroke-width: 2; }
+  svg :global(.tag) { fill: var(--ok); stroke: none; }
+  svg :global(.sheet) { fill: url(#sheet-hatch); fill-opacity: 0.16; stroke: none; }
+  svg :global(.troof) { stroke: var(--signal); stroke-width: 2; }
+  svg :global(.troof-fill) { fill: var(--signal); fill-opacity: 0.12; stroke: none; }
+  .tag-text { font-family: var(--mono); font-size: 8.5px; font-weight: 700; fill: var(--ink); }
+  .dim-text { font-family: var(--mono); font-size: 11px; fill: var(--on-ink-soft); }
+  .sweep-glow { opacity: 0; }
+
+  /* Without JS: the finished scaffold, handed over. */
+  :global(html:not(.js)) .method :global(svg) :global(:is(.envelope, .mark, .sweep, .sheet, .troof, .troof-fill)) { display: none; }
+
+  /* Steps */
+  .method__steps { display: grid; }
+  .step {
+    min-height: 78svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding-block: 2rem;
+    border-top: 1px solid var(--rule-ink);
+    transition: opacity 400ms var(--ease);
+  }
+  .step:last-child { min-height: 70svh; }
+  :global(html.js-motion) .step:not(.is-active) { opacity: 0.38; }
+  .step__no {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(4rem, 3rem + 4vw, 7.5rem);
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--on-ink-soft);
+  }
+  .step.is-active .step__no { -webkit-text-stroke-color: var(--signal); }
+  .step__body { max-width: 40ch; color: #d4d9d8; }
+  .step__note { color: var(--on-ink-soft); }
+  .step__note .tick { font-size: 0.6rem; margin-right: 0.3rem; }
+  .step__link { align-self: flex-start; }
+  .step__link :global(svg) { color: var(--signal); }
+
+  @media (max-width: 900px) {
+    .method__body { grid-template-columns: 1fr; gap: 0; }
+    .method__stage { position: sticky; top: var(--header-h); z-index: 2; height: 50svh; margin-inline: calc(var(--gutter) * -1); box-shadow: 0 calc(var(--header-h) * -1) 0 var(--ink-2); }
+    .method__drawing { position: relative; top: 0; height: 100%; border-inline: 0; padding: 0.6rem var(--gutter); }
+    .method__steps { position: relative; z-index: 1; }
+    .step { min-height: 42svh; justify-content: flex-start; padding-block: 1.75rem 2.5rem; }
+    .step:last-child { min-height: 50svh; }
+    .step__no { font-size: 3.5rem; }
+    .method__caption { display: none; }
+  }
+</style>

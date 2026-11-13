@@ -1,0 +1,88 @@
+---
+import { brand } from "../data/site";
+import { images } from "../data/images";
+import Photo from "./Photo.astro";
+import Icon from "./Icon.astro";
+
+const statement =
+  "Scaffolding is the structure that lets everyone else do their job. Roofers, bricklayers, masons and painters work on it. Neighbours and passers‑by walk beneath it. We plan every scaffold around all of them.";
+const words = statement.split(" ");
+---
+<section class="intro paper section" id="about" aria-labelledby="intro-title">
+  <div class="wrap">
+    <p class="kicker label"><b>01</b> What we do</p>
+    <h2 id="intro-title" class="visually-hidden">What Transom does</h2>
+    <p class="intro__statement" data-words>
+      {words.map((w) => <span>{w} </span>)}
+    </p>
+  </div>
+
+  <div class="intro__doors wrap">
+    <article class="door door--home">
+      <Photo image={images.extension} sizes="(max-width: 800px) 100vw, 56vw" slats />
+      <div class="door__text">
+        <p class="label soft">For homeowners</p>
+        <h3 class="h3">Your house, your street, your neighbours.</h3>
+        <p>
+          Extensions, re-roofs, chimneys and rendering. We visit, explain what the scaffold will look like
+          and where it will stand, and give you a written quote.
+        </p>
+        <a class="link" href={brand.whatsappHref} data-contact="whatsapp"><Icon name="chat" />Send us photos on WhatsApp</a>
+      </div>
+    </article>
+
+    <article class="door door--site">
+      <Photo image={images.erecting} sizes="(max-width: 800px) 100vw, 40vw" slats />
+      <div class="door__text">
+        <p class="label soft">For contractors</p>
+        <h3 class="h3">Programmed around your trades.</h3>
+        <p>
+          Façades, phased wraps, stair towers and loading bays for builders and main contractors, changed
+          as the job moves on.
+        </p>
+        <a class="link" href={`mailto:${brand.email}`} data-contact="email"><Icon name="mail" />Send drawings and a programme</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<style>
+  .intro__statement {
+    max-width: 21ch;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.3rem, 1.3rem + 4.2vw, 6rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.002em;
+  }
+  .intro__statement span { transition: color 300ms linear; }
+  /* Scroll-linked: words start pale and darken as they pass. Readable without JS. */
+  :global(html.js-motion) .intro__statement span { color: color-mix(in srgb, var(--text) 22%, var(--paper)); }
+  :global(html.js-motion) .intro__statement span.is-on { color: var(--text); }
+
+  .intro__doors {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: clamp(1rem, 2.5vw, 2.5rem);
+    margin-top: clamp(4rem, 9vw, 8rem);
+  }
+  .door { display: grid; gap: 1.5rem; align-content: start; }
+  .door--home { grid-column: 1 / span 7; }
+  .door--site { grid-column: 9 / span 4; margin-top: clamp(6rem, 18vw, 18rem); }
+  .door--home :global(.frame) { aspect-ratio: 4 / 3; }
+  .door--site :global(.frame) { aspect-ratio: 4 / 5; }
+  .door__text { display: grid; gap: 0.9rem; max-width: 34rem; }
+  .door__text p:not(.label) { color: var(--text-soft); }
+  .door .link { justify-self: start; margin-top: 0.25rem; }
+  .door .link :global(svg) { color: var(--signal-ink); }
+  .door--home .door__text { padding-left: clamp(0rem, 8vw, 8rem); }
+  :global([data-slats]) { --slat-bg: var(--paper); }
+
+  @media (max-width: 800px) {
+    .intro__doors { grid-template-columns: 1fr; row-gap: 4rem; }
+    .door--home, .door--site { grid-column: 1; margin-top: 0; }
+    .door--home .door__text { padding-left: 0; }
+    .door--site :global(.frame) { aspect-ratio: 4 / 3; width: 88%; margin-left: auto; }
+  }
+</style>

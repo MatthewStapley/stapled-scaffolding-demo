@@ -1,0 +1,18 @@
+---
+// Small line icons, drawn for this site on a 24-unit grid.
+interface Props { name: "arrow" | "down" | "phone" | "chat" | "mail" | "menu" | "close" | "check" | "pin" | "plus"; class?: string }
+const { name, class: cls } = Astro.props;
+const paths: Record<Props["name"], string> = {
+  arrow: "M4 12h15M13 6l6 6-6 6",
+  down: "M12 4v15M6 13l6 6 6-6",
+  phone: "M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2z",
+  chat: "M4 18.5V6.5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8.5L4 20zM8.5 9.5h7M8.5 12.5h4.5",
+  mail: "M3.5 6h17v12h-17zM3.5 6.5l8.5 6.5 8.5-6.5",
+  menu: "M3 8h18M3 16h18",
+  close: "M5 5l14 14M19 5L5 19",
+  check: "M4.5 12.5l5 5 10-11",
+  pin: "M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11zM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z",
+  plus: "M12 4v16M4 12h16",
+};
+---
+<svg class:list={["i", cls]} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d={paths[name]} /></svg>

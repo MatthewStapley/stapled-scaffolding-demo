@@ -1,0 +1,27 @@
+---
+// Transom mark: two standards and the transom that spans them.
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+<span class:list={["mark", cls]}>
+  <svg viewBox="0 0 28 24" aria-hidden="true" focusable="false">
+    <path d="M5 1v22M23 1v22" stroke="currentColor" stroke-width="2.6" />
+    <path d="M1 9h26" stroke="var(--signal)" stroke-width="3" />
+  </svg>
+  <span class="mark__word">Transom</span>
+</span>
+
+<style>
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.6rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  svg { width: 1.15em; height: auto; flex: none; }
+</style>

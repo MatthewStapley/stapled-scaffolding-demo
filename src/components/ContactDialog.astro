@@ -1,0 +1,64 @@
+---
+// Phone, WhatsApp and email actions open this instead of dialling or messaging,
+// because the details are reserved examples that reach no-one.
+import { brand, stapled, whatsappMessage } from "../data/site";
+import Icon from "./Icon.astro";
+---
+<dialog class="cd" data-contact-dialog aria-labelledby="cd-title">
+  <form method="dialog" class="cd__box">
+    <button class="cd__x" value="close" aria-label="Close"><Icon name="close" /></button>
+    <p class="label cd__kind" data-cd-kind>Phone</p>
+    <h2 class="cd__title" id="cd-title" data-cd-title>This would call the yard</h2>
+
+    <div class="cd__panel" data-cd-panel="phone">
+      <p>On a live site, tapping the number opens your phone's dialler with <b>{brand.phone}</b> ready to call. On a computer it shows the number to copy.</p>
+    </div>
+    <div class="cd__panel" data-cd-panel="whatsapp" hidden>
+      <p>On a live site this opens WhatsApp with a message already started, so it's easy to add photos of the building:</p>
+      <p class="cd__bubble">{whatsappMessage}</p>
+    </div>
+    <div class="cd__panel" data-cd-panel="email" hidden>
+      <p>On a live site this opens a new email to <b>{brand.email}</b> with the subject "Scaffolding enquiry".</p>
+    </div>
+
+    <p class="cd__small">Transom is fictional. The phone numbers come from ranges Ofcom keeps for drama and the email domain is reserved, so nothing here reaches a real business.</p>
+    <div class="cd__actions">
+      <button class="btn btn--dark" value="close">Got it</button>
+      <a class="link" href={stapled.enquiryUrl}>Want a site like this? Talk to Stapled. <Icon name="arrow" /></a>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  .cd {
+    width: min(32rem, calc(100vw - 2rem));
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--text);
+    color-scheme: light;
+    box-shadow: 0 40px 100px -20px #000c;
+  }
+  .cd::backdrop { background: color-mix(in srgb, var(--ink) 72%, transparent); backdrop-filter: blur(3px); }
+  :global(html.js-motion) .cd[open] { animation: cd-in 280ms var(--ease) both; }
+  :global(html.js-motion) .cd[open]::backdrop { animation: cd-fade 280ms var(--ease) both; }
+  @keyframes cd-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } }
+  @keyframes cd-fade { from { opacity: 0; } }
+  .cd__box { position: relative; display: grid; gap: 0.9rem; padding: clamp(1.5rem, 4vw, 2.25rem); }
+  .cd__x { position: absolute; right: 0.75rem; top: 0.75rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; background: none; color: var(--text); }
+  .cd__x :global(svg) { width: 1.3rem; height: 1.3rem; }
+  .cd__kind { color: var(--signal-ink); }
+  .cd__title { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 2.25rem; line-height: 0.95; padding-right: 2.5rem; }
+  .cd__bubble {
+    position: relative;
+    margin-top: 0.4rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px 12px 12px 2px;
+    background: #fff;
+    box-shadow: 0 1px 0 #0000001a;
+    font-size: 0.9375rem;
+  }
+  .cd__small { font-size: 0.875rem; color: var(--text-soft); padding-top: 0.75rem; border-top: 1px solid var(--rule-paper); }
+  .cd__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; margin-top: 0.25rem; }
+</style>

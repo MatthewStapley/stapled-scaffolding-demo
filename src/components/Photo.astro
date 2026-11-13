@@ -1,0 +1,31 @@
+---
+// Responsive graded photograph. `slats` adds the board-by-board reveal.
+import { src, srcset, type Img } from "../data/images";
+interface Props {
+  image: Img;
+  sizes: string;
+  class?: string;
+  slats?: boolean;
+  eager?: boolean;
+  tag?: string;
+  parallax?: boolean;
+}
+const { image, sizes, class: cls, slats = false, eager = false, tag = "Illustrative image", parallax = false } = Astro.props;
+const fallbackW = image.widths.includes(1024) ? 1024 : image.widths[0];
+---
+<figure class:list={["frame", cls]} data-slats={slats ? "" : undefined}>
+  <img
+    src={src(image, fallbackW)}
+    srcset={srcset(image)}
+    sizes={sizes}
+    alt={image.alt}
+    width={1600}
+    height={Math.round(1600 / image.ratio)}
+    loading={eager ? "eager" : "lazy"}
+    decoding="async"
+    style={image.pos ? `object-position:${image.pos}` : undefined}
+    data-parallax={parallax ? "" : undefined}
+  />
+  {slats && <span class="slats" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>}
+  {tag && <figcaption class="credit-tag">{tag}</figcaption>}
+</figure>
